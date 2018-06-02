@@ -7,6 +7,7 @@ import play.db.ebean.EbeanConfig;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -26,11 +27,12 @@ public class UserRepository {
         this.executionContext = executionContext;
     }
 
-    public CompletionStage<List<User>> list(String role) {
-        return supplyAsync(() ->
+    public CompletionStage<List<User>> list(Optional<String> roleOpt) {
+        return roleOpt.map(s -> supplyAsync(() ->
                 ebeanServer.find(User.class).where()
-                        .eq("role", role)
-                        .findList(), executionContext);
+                        .eq("role", s)
+                        .findList(), executionContext)).orElseGet(() -> supplyAsync(() ->
+                ebeanServer.find(User.class).findList()));
     }
 
     public CompletionStage<Long> insert(User user) {
