@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import models.User;
 import play.db.ebean.EbeanConfig;
+import play.db.ebean.EbeanDynamicEvolutions;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -21,9 +22,11 @@ public class UserRepository {
 
     private final EbeanServer ebeanServer;
     private final DatabaseExecutionContext executionContext;
+    private final EbeanDynamicEvolutions ebeanDynamicEvolutions;
 
     @Inject
-    public UserRepository(EbeanConfig ebeanConfig, DatabaseExecutionContext executionContext) {
+    public UserRepository(EbeanConfig ebeanConfig, EbeanDynamicEvolutions ebeanDynamicEvolutions, DatabaseExecutionContext executionContext) {
+        this.ebeanDynamicEvolutions = ebeanDynamicEvolutions;
         this.ebeanServer = Ebean.getServer(ebeanConfig.defaultServer());
         this.executionContext = executionContext;
     }
