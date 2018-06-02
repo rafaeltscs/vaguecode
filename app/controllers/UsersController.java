@@ -2,6 +2,7 @@ package controllers;
 
 import exception.DuplicatedRecordException;
 import models.User;
+import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
@@ -15,6 +16,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public class UsersController extends Controller {
+
+    private static final Logger.ALogger logger = Logger.of(UsersController.class);
 
     private final UserRepository userRepository;
     private final HttpExecutionContext httpExecutionContext;
