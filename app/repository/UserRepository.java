@@ -1,5 +1,6 @@
 package repository;
 
+import exception.DuplicatedRecordException;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import models.User;
@@ -35,7 +36,10 @@ public class UserRepository {
                 ebeanServer.find(User.class).findList()));
     }
 
-    public CompletionStage<Long> insert(User user) {
+    public CompletionStage<Long> insert(User user) throws DuplicatedRecordException {
+        if (ebeanServer.find(User.class).where().eq("name", user.name).findCount() > 0)
+            throw new DuplicatedRecordException("User already exists.");
+
         return supplyAsync(() -> {
             ebeanServer.insert(user);
             return user.id;

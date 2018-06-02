@@ -1,5 +1,6 @@
 package controllers;
 
+import exception.DuplicatedRecordException;
 import models.User;
 import play.data.Form;
 import play.data.FormFactory;
@@ -35,19 +36,15 @@ public class UsersController extends Controller {
     public CompletionStage<Result> create() {
         Form<User> userForm = formFactory.form(User.class).bindFromRequest();
         if (userForm.hasErrors()) {
-            // Run companies db operation and then render the form
             return CompletableFuture.completedFuture(badRequest("Could not create user."));
-
-//            return applyAsync(companies -> {
-//                // This is the HTTP rendering thread context
-//                return badRequest("Could not create user.");
-//            }, httpExecutionContext.current());
         }
 
         User user = userForm.get();
-        // Run insert db operation, then redirect
-        return userRepository.insert(user).thenApplyAsync(data -> {
-            return created("User created.");
-        }, httpExecutionContext.current());
+
+        try {
+            return userRepository.insert(user).thenApplyAsync(data ->  created("User created."), httpExecutionContext.current());
+        } catch (DuplicatedRecordException e) {
+            return CompletableFuture.completedFuture(badRequest(e.getMessage()));
+        }
     }
 }
